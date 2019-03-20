@@ -46,6 +46,7 @@ Returns: HTTP 200 returns lists of words with the most anagrams and their words
 
 POST: http://ec2-52-14-18-78.us-east-2.compute.amazonaws.com:9000/anagram/anagramcomparecheck
 Summary: Takes a list of words and checks if those words are anagrams of each other
+Sample Json: { "words": ["read", "dear", "dare"] }
 Returns: HTTP 200 - List of lists of words that are anagrams of each other, empty if none
 
 GET: http://ec2-52-14-18-78.us-east-2.compute.amazonaws.com:9000/anagram/anagramgroup
