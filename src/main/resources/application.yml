@@ -1,0 +1,20 @@
+server:
+  port: 9000
+  contextPath: /anagram
+  error:
+    whitelabel:
+      enabled: true
+    path: /error
+  tomcat:
+    basedir: anagram-app-tomcat-logs
+    accesslog:
+      enabled: true
+      pattern: "%h %l %u %t \"%r\" %s %b %D"
+      buffered: false
+multipart:
+    maxFileSize: 10Mb
+    maxRequestSize: 10Mb
+http:
+  multipart: 
+    max-file-size: 10240KB
+    max-request-size: 10240KB
