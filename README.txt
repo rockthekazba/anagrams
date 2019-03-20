@@ -8,7 +8,7 @@ The project is built as a java jar project and is currently deployed on AWS EC2 
 http://ec2-52-14-18-78.us-east-2.compute.amazonaws.com:9000/anagram/
 Locally code can be built as jar and executed through command line by running java -jar [name of jar file]. The application runs on port 9000.
 
-The code based is accessible via repository on GitHub and can be found at:
+The code based is accessible via repository on GitHub and can be found at: https://github.com/rockthekazba/anagrams
 
 The project is built as a Spring Boot project using Maven and comprises a several RESTful APIs as indicated below. Java 8 runtime and jdk is utilized.
 
