@@ -52,6 +52,7 @@ Returns: HTTP 200 - List of lists of words that are anagrams of each other, empt
 GET: http://ec2-52-14-18-78.us-east-2.compute.amazonaws.com:9000/anagram/anagramgroup
 Summary: Returns a list of word groups that have a number of anagrams of specific size. Takes required parameter
 	groupsize=[integer] - Parameter indicating words with only as many anagrams specified 
+Returns: HTTP 200 - List of words and anagrams with groupsize indicated
 	
 	
 Storage:
