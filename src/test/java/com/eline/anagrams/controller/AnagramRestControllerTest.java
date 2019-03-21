@@ -36,11 +36,14 @@ public class AnagramRestControllerTest {
 	@Autowired
 	Gson gson;
 
+	private String sessionId = null;
+
 	@Before
 	public void createCorpus() throws IOException {
 		CorpusWords words = new CorpusWords();
 		words.setWords(mockWords());
 		restController.createCorpus(words, request, response);
+		sessionId = response.getHeader("sessionId");
 	}
 
 	@Test
@@ -50,13 +53,19 @@ public class AnagramRestControllerTest {
 
 	@Test
 	public void testCorpusWasCreated() throws IOException {
-		assertTrue(CacheManager.getCorpusList().length == 5);
+		assertTrue(CacheManager.getCorpusListBySession(sessionId).length == 5);
 	}
 
 	@Test
 	public void testGetCorpus() {
+		request.addHeader("sessionId", sessionId);
 		assertTrue(restController.getCorpus(request, response).length == 5);
 
+	}
+
+	@Test
+	public void testGetCorpusById() {
+		assertNotNull(CacheManager.getCorpusListBySession(sessionId));
 	}
 
 	@Test
@@ -67,7 +76,8 @@ public class AnagramRestControllerTest {
 
 	@Test
 	public void testGetWordsWithMostAnagrams() {
-		CacheManager.setCorpusList(mockWords());
+		CacheManager.getCorpusListBySessionHM().put(request.getHeader("sessionId"), mockWords());
+		request.addHeader("sessionId", sessionId);
 		HashMap<String, List<String>> wordsWithMostAnagrams = restController.getWordsWithMostAnagrams(request,
 				response);
 		assertTrue(wordsWithMostAnagrams.get("least") != null);
@@ -77,8 +87,9 @@ public class AnagramRestControllerTest {
 	@Test
 	public void testDeleteWordFromCorpus() throws IOException {
 		request.setParameter("deleteAnagrams", "false");
+		request.addHeader("sessionId", sessionId);
 		restController.deleteAnagramFromCorpus("resent", request, response);
-		assertTrue(CacheManager.getCorpusList().length == 4);
+		assertTrue(CacheManager.getCorpusListBySession(sessionId).length == 4);
 	}
 
 	@Test
@@ -87,14 +98,16 @@ public class AnagramRestControllerTest {
 		words.setWords(mockWordsAsAntagrams());
 		restController.createCorpus(words, request, response);
 		request.setParameter("deleteAnagrams", "true");
+		request.addHeader("sessionId", sessionId);
 		restController.deleteAnagramFromCorpus("spear", request, response);
-		assertTrue(CacheManager.getCorpusList().length == 2);
+		assertTrue(CacheManager.getCorpusListBySession(response.getHeader("sessionId")).length == 2);
 	}
 
 	@Test
 	public void testDeleteAllFromCorpus() {
+		request.addHeader("sessionId", sessionId);
 		restController.deleteAllFromCorpus(request, response);
-		assertTrue(CacheManager.getCorpusList() == null);
+		assertTrue(CacheManager.getCorpusListBySession(sessionId) == null);
 	}
 
 	@Test
@@ -115,6 +128,7 @@ public class AnagramRestControllerTest {
 
 	@Test
 	public void testGetAnagramGroupBySize() {
+		request.addHeader("sessionId", sessionId);
 		HashMap<String, List<String>> anagramGroups = restController.getAnagramGroupBySize(String.valueOf(1), request,
 				response);
 

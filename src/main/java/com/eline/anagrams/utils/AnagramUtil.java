@@ -63,28 +63,6 @@ public class AnagramUtil {
 		log.info("Finish loading dictionary.txt to memory. # Of Records " + CacheManager.getDictionaryMap().size());
 	}
 
-	/*
-	 * public void loadDictionaryMap() { List<String> dictionaryList =
-	 * buildDictionaryListFromFile(); if (dictionaryList != null &&
-	 * dictionaryList.size() > 0) { // turn into character array and sort String key
-	 * = null; for (String word : dictionaryList) { key = sortedString(word);
-	 * List<String> wordSet = CacheManager.getDictionaryMap().get(key); if (wordSet
-	 * == null) { wordSet = new ArrayList<String>(); } wordSet.add(word);
-	 * CacheManager.getDictionaryMap().put(key, wordSet);
-	 * 
-	 * } log.info("Finish loading dictionary.txt to memory. # Of Records " +
-	 * CacheManager.getDictionaryMap().size()); } }
-	 * 
-	 * public List<String> buildDictionaryListFromFile() { ClassLoader loader =
-	 * ClassLoader.getSystemClassLoader(); List<String> lines =
-	 * Collections.emptyList(); try { lines =
-	 * Files.readAllLines((Paths.get(loader.getResource(DICTIONARY_FILE).toURI())),
-	 * StandardCharsets.UTF_8); } catch (IOException e) { e.printStackTrace(); }
-	 * catch (URISyntaxException e) { // TODO Auto-generated catch block
-	 * e.printStackTrace(); } log.info("Finished loading dictionary file: " +
-	 * lines.size()); return lines; }
-	 */
-
 	public HashMap<String, List<String>> buildAnagramDictionaryByList(String[] wordsAnagramDictionary) {
 
 		HashMap<String, List<String>> anagramWordList = new HashMap<String, List<String>>();

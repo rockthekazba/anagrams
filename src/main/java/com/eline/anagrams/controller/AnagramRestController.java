@@ -46,9 +46,13 @@ public class AnagramRestController {
 
 		log.info("AnagramRestController createCorpus: Creating corpus in AnagramRestController");
 
-		CacheManager.setCorpusList(corpusWords.getWords());
-
-		return CacheManager.getCorpusList();
+		// CacheManager.setCorpusList(corpusWords.getWords());
+		String sessionId = request.getSession().getId();
+		response.setHeader("sessionId", sessionId);
+		HashMap<String, String[]> cachedHMBySession = new HashMap<String, String[]>();
+		cachedHMBySession.put(sessionId, corpusWords.getWords());
+		CacheManager.setCorpusListBySessionHM(cachedHMBySession);
+		return CacheManager.getCorpusListBySession(sessionId);
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -56,7 +60,8 @@ public class AnagramRestController {
 	public String[] getCorpus(HttpServletRequest request, HttpServletResponse response) {
 
 		log.info("AnagramRestController.getCorpus: Retrieving all corpus records");
-		return CacheManager.getCorpusList();
+
+		return CacheManager.getCorpusListBySession(request.getHeader("sessionId"));
 
 	}
 
@@ -85,20 +90,23 @@ public class AnagramRestController {
 			HttpServletResponse response) {
 
 		log.info("AnagramRestController.deleteAnagramFromCorpus: Deleting word " + word);
-		if (CacheManager.getCorpusList() != null) {
+		if (CacheManager.getCorpusListBySession(request.getHeader("sessionId")) != null) {
 			List<String> newList = new ArrayList<String>();
-			Collections.addAll(newList, CacheManager.getCorpusList());
+			Collections.addAll(newList, CacheManager.getCorpusListBySession(request.getHeader("sessionId")));
 			newList.remove(word);
 			String deleteAnagrams = request.getParameter("deleteAnagrams");
 			// delete anagrams if indicated
 			if (deleteAnagrams != null && deleteAnagrams.equalsIgnoreCase("true")) {
-				List<String> anagramList = util.buildAnagramDictionaryByList(CacheManager.getCorpusList())
+				List<String> anagramList = util
+						.buildAnagramDictionaryByList(
+								CacheManager.getCorpusListBySession(request.getHeader("sessionId")))
 						.get(util.sortedString(word));
 				if (anagramList != null && anagramList.size() > 0)
 					newList.removeAll(anagramList);
 			}
 
-			CacheManager.setCorpusList(newList.stream().toArray(String[]::new));
+			CacheManager.getCorpusListBySessionHM().put(request.getHeader("sessionId"),
+					newList.stream().toArray(String[]::new));
 		}
 	}
 
@@ -106,7 +114,10 @@ public class AnagramRestController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteAllFromCorpus(HttpServletRequest request, HttpServletResponse response) {
 		log.info("AnagramRestController.deleteAllFromCorpus: Deleting all words from corpus");
-		CacheManager.setCorpusList(null);
+		if (CacheManager.getCorpusListBySession(request.getHeader("sessionId")) != null) {
+			CacheManager.getCorpusListBySessionHM().remove(request.getHeader("sessionId"));
+
+		}
 	}
 
 	@RequestMapping(value = "/corpusstats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -114,7 +125,7 @@ public class AnagramRestController {
 	public CorpusStats getCorpusStats(HttpServletRequest request, HttpServletResponse response) {
 
 		log.info("AnagramRestController.getCorpusStats: Retrieving corpus stats");
-		CorpusStats stats = util.buildCorpusStats(CacheManager.getCorpusList());
+		CorpusStats stats = util.buildCorpusStats(CacheManager.getCorpusListBySession(request.getHeader("sessionId")));
 		return stats;
 	}
 
@@ -124,7 +135,7 @@ public class AnagramRestController {
 			HttpServletResponse response) {
 		log.info("AnagramRestController.mostanagrams: Retrieving most anagrams");
 
-		return service.getWordsWithMostAnagrams(CacheManager.getCorpusList());
+		return service.getWordsWithMostAnagrams(CacheManager.getCorpusListBySession(request.getHeader("sessionId")));
 	}
 
 	@RequestMapping(value = "/anagramcomparecheck", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -156,7 +167,8 @@ public class AnagramRestController {
 		if (groupsize != null)
 			groupSize = util.intFromString(groupsize);
 
-		return service.getAnagramGroupsBySize(CacheManager.getCorpusList(), groupSize);
+		return service.getAnagramGroupsBySize(CacheManager.getCorpusListBySession(request.getHeader("sessionId")),
+				groupSize);
 	}
 
 }
